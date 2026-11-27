@@ -56,9 +56,10 @@ content:
         label: "등록일"
         type: date
         required: true
-      - name: assessment_image
-        label: "위험성평가표 이미지 (스캔/사진 첨부)"
+      - name: assessment_images
+        label: "위험성평가표 이미지 (여러 장 동시 첨부 가능)"
         type: image
+        list: true
       - name: body
         label: "추가 설명 및 위험요인 텍스트 (선택)"
         type: rich-text
