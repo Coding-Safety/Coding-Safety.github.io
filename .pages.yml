@@ -41,8 +41,8 @@ content:
         type: reference
         options:
           collection: companies
-          value: "{name}"
-          label: "{name}"
+          value: "{fields.name}"
+          label: "{fields.name}"
         required: true
       - name: title
         label: "작업명 / 평가 제목"
