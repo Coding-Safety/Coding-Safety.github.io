@@ -8,39 +8,95 @@ layout: none
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>현장 업체별 위험성평가</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; max-width: 720px; margin: 0 auto; padding: 20px; background: #f8f9fa; color: #212529; }
-    header { background: #1e3a8a; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-    header h1 { margin: 0 0 6px 0; font-size: 1.4rem; }
-    header p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
-    .search-box { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; margin-bottom: 16px; }
-    .card { display: block; background: white; padding: 16px; border-radius: 8px; margin-bottom: 12px; text-decoration: none; color: inherit; border: 1px solid #e9ecef; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; margin: 0; background: #f8f9fa; color: #212529; }
+    header { background: #1e3a8a; color: white; padding: 18px 24px; }
+    header h1 { margin: 0 0 4px 0; font-size: 1.35rem; }
+    header p { margin: 0; font-size: 0.88rem; opacity: 0.9; }
+
+    .layout { display: flex; max-width: 1080px; margin: 20px auto; padding: 0 16px; gap: 20px; align-items: flex-start; }
+
+    /* 왼쪽 업체별 메뉴 사이드바 */
+    .sidebar { width: 240px; flex-shrink: 0; background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; }
+    .sidebar-title { font-size: 0.9rem; font-weight: bold; color: #475569; margin: 0 0 10px 6px; }
+    .menu-btn { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left; background: none; border: none; padding: 10px 12px; border-radius: 7px; font-size: 0.95rem; color: #334155; cursor: pointer; margin-bottom: 4px; }
+    .menu-btn:hover { background: #f1f5f9; }
+    .menu-btn.active { background: #1e3a8a; color: white; font-weight: bold; }
+    .badge { font-size: 0.78rem; background: #e2e8f0; color: #334155; padding: 2px 7px; border-radius: 12px; }
+    .menu-btn.active .badge { background: rgba(255,255,255,0.25); color: white; }
+
+    /* 오른쪽 메인 목록 영역 */
+    .main { flex: 1; min-width: 0; }
+    .search-box { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 14px; background: white; }
+    .card { display: block; background: white; padding: 16px; border-radius: 8px; margin-bottom: 12px; text-decoration: none; color: inherit; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
     .card:hover { border-color: #1e3a8a; }
-    .card-title { font-weight: bold; font-size: 1.1rem; color: #1e3a8a; margin-bottom: 6px; }
-    .card-meta { font-size: 0.85rem; color: #6c757d; }
+    .company-tag { display: inline-block; font-size: 0.78rem; font-weight: bold; color: #1e3a8a; background: #eff6ff; padding: 3px 8px; border-radius: 5px; margin-bottom: 6px; }
+    .card-title { font-weight: bold; font-size: 1.08rem; color: #0f172a; margin-bottom: 6px; }
+    .card-meta { font-size: 0.85rem; color: #64748b; }
+
+    /* 모바일 화면 대응 */
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; }
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>현장 업체별 위험성평가</h1>
-    <p>업체명을 검색하거나 선택하여 상세 내용을 확인하세요.</p>
+    <p>왼쪽 메뉴에서 업체를 선택하거나 검색하여 위험성평가표를 확인하세요.</p>
   </header>
 
-  <input type="text" id="searchInput" class="search-box" placeholder="업체명 또는 공종 검색..." onkeyup="filterCards()">
+  {% assign companies = site.posts | map: "company" | compact | uniq | sort %}
 
-  <div id="postList">
-    {% for post in site.posts %}
-    <a href="{{ post.url | relative_url }}" class="card">
-      <div class="card-title">{{ post.title }}</div>
-      <div class="card-meta">공종: {{ post.work_type | default: "미지정" }} | 등록일: {{ post.date | date: "%Y-%m-%d" }}</div>
-    </a>
-    {% endfor %}
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-title">협력업체 목록</div>
+      <button class="menu-btn active" data-company="ALL" onclick="selectCompany('ALL', this)">
+        <span>전체 업체</span>
+        <span class="badge">{{ site.posts.size }}</span>
+      </button>
+      {% for comp in companies %}
+        {% assign comp_posts = site.posts | where: "company", comp %}
+        <button class="menu-btn" data-company="{{ comp }}" onclick="selectCompany('{{ comp }}', this)">
+          <span>{{ comp }}</span>
+          <span class="badge">{{ comp_posts.size }}</span>
+        </button>
+      {% endfor %}
+    </aside>
+
+    <main class="main">
+      <input type="text" id="searchInput" class="search-box" placeholder="업체명, 작업명, 공종 검색..." onkeyup="filterCards()">
+
+      <div id="postList">
+        {% for post in site.posts %}
+        <a href="{{ post.url | relative_url }}" class="card" data-company="{{ post.company | default: '미지정' }}">
+          <div class="company-tag">{{ post.company | default: "업체 미지정" }}</div>
+          <div class="card-title">{{ post.title }}</div>
+          <div class="card-meta">공종: {{ post.work_type | default: "미지정" }} | 등록일: {{ post.date | date: "%Y-%m-%d" }}</div>
+        </a>
+        {% endfor %}
+      </div>
+    </main>
   </div>
 
   <script>
+    let selectedCompany = 'ALL';
+
+    function selectCompany(company, btn) {
+      selectedCompany = company;
+      document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterCards();
+    }
+
     function filterCards() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       document.querySelectorAll('.card').forEach(card => {
-        card.style.display = card.innerText.toLowerCase().includes(q) ? 'block' : 'none';
+        const cardCompany = card.getAttribute('data-company');
+        const matchCompany = (selectedCompany === 'ALL') || (cardCompany === selectedCompany);
+        const matchSearch = card.innerText.toLowerCase().includes(q);
+        card.style.display = (matchCompany && matchSearch) ? 'block' : 'none';
       });
     }
   </script>
