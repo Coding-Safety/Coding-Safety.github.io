@@ -1,0 +1,113 @@
+---
+layout: none
+---
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>위험성평가 전용 관리자</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; background: #f1f5f9; margin: 0; color: #1e293b; }
+    header { background: #1e3a8a; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { margin: 0; font-size: 1.25rem; }
+    header a { color: #dbeafe; text-decoration: none; font-size: 0.9rem; }
+    .container { max-width: 860px; margin: 24px auto; padding: 0 16px; }
+    .card { background: white; padding: 22px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    h2 { margin-top: 0; font-size: 1.15rem; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+    label { display: block; font-weight: bold; font-size: 0.9rem; margin: 14px 0 6px; }
+    input[type="text"], input[type="password"], input[type="date"], select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
+    .row { display: flex; gap: 10px; align-items: center; }
+    .btn { background: #1e3a8a; color: white; border: none; padding: 11px 18px; border-radius: 6px; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
+    .btn:hover { background: #1d4ed8; }
+    .btn-sub { background: #475569; }
+    .btn-danger { background: #dc2626; padding: 6px 10px; font-size: 0.8rem; }
+    .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 12px; border: 1px solid #cbd5e1; background: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .tab-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
+    .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 12px; }
+    .preview-item { position: relative; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #f8fafc; }
+    .preview-item img { width: 100%; height: 140px; object-fit: cover; display: block; }
+    .del-img-btn { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: rgba(220, 38, 38, 0.92); color: white; border: none; font-weight: bold; cursor: pointer; line-height: 1; }
+    .badge-new { position: absolute; bottom: 6px; left: 6px; background: #2563eb; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; }
+    .post-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+    .post-row:last-child { border-bottom: none; }
+    #statusMsg { margin-top: 12px; font-weight: bold; color: #1e3a8a; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>위험성평가 전용 관리자</h1>
+    <a href="/">← 홈페이지로 이동</a>
+  </header>
+  <div class="container">
+    <div id="authCard" class="card">
+      <h2>안전관리자 인증 (깃허브 토큰)</h2>
+      <p style="font-size:0.88rem; color:#475569; margin:0 0 12px;">최초 1회 본인 깃허브 개인 토큰(Personal Access Token)을 입력하면 브라우저에 저장됩니다.</p>
+      <div class="row">
+        <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        <button class="btn" onclick="saveToken()">로그인</button>
+      </div>
+    </div>
+    <div id="adminArea" class="hidden">
+      <div style="text-align:right; margin-bottom:10px;">
+        <span id="userInfo" style="font-size:0.85rem; color:#475569; margin-right:10px;"></span>
+        <button class="btn btn-sub" style="padding:6px 12px; font-size:0.8rem;" onclick="logout()">로그아웃</button>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('writeTab', this)">위험성평가 등록 / 수정</button>
+        <button class="tab-btn" onclick="switchTab('companyTab', this)">협력업체 추가 / 관리</button>
+      </div>
+      <div id="writeTab">
+        <div class="card">
+          <h2 id="formTitle">새 위험성평가 등록</h2>
+          <input type="hidden" id="editPath">
+          <input type="hidden" id="editSha">
+          <label>업체 선택 *</label>
+          <select id="companySelect"></select>
+          <label>작업명 / 평가 제목 *</label>
+          <input type="text" id="postTitle" placeholder="예: 12월 정기 위험성평가 - 철골 조립">
+          <label>세부 공종 *</label>
+          <input type="text" id="workType" placeholder="예: 철골공사">
+          <label>등록일 *</label>
+          <input type="date" id="postDate">
+          <label>위험성평가표 이미지 (여러 장 한 번에 선택 가능)</label>
+          <input type="file" id="imageFiles" accept="image/*" multiple onchange="handleFiles(this.files)">
+          <div id="previewGrid" class="preview-grid"></div>
+          <label>추가 설명 및 주요 위험요인 (선택)</label>
+          <textarea id="postBody" rows="5" placeholder="특이사항이나 전달사항을 입력하세요."></textarea>
+          <div style="margin-top:18px; display:flex; gap:10px;">
+            <button class="btn" id="submitBtn" onclick="savePost()">저장 및 홈페이지 반영</button>
+            <button class="btn btn-sub hidden" id="cancelEditBtn" onclick="resetForm()">새 글 작성으로 전환</button>
+          </div>
+          <div id="statusMsg"></div>
+        </div>
+        <div class="card">
+          <h2>등록된 위험성평가 목록 (수정 / 삭제)</h2>
+          <div id="postListArea">불러오는 중...</div>
+        </div>
+      </div>
+      <div id="companyTab" class="hidden">
+        <div class="card">
+          <h2>새 협력업체 등록</h2>
+          <label>업체명 *</label>
+          <input type="text" id="newCompanyName" placeholder="예: (주)한국건설">
+          <label>주력 공종</label>
+          <input type="text" id="newCompanyWork" placeholder="예: 철골 및 비계">
+          <label>담당자 / 연락처</label>
+          <input type="text" id="newCompanyManager" placeholder="예: 홍길동 소장 (010-0000-0000)">
+          <button class="btn" style="margin-top:14px;" onclick="addCompany()">업체 추가</button>
+        </div>
+        <div class="card">
+          <h2>등록된 협력업체 목록</h2>
+          <div id="companyListArea">불러오는 중...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/admin.js"></script>
+</body>
+</html>
