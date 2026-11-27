@@ -27,6 +27,9 @@ content:
         label: "등록일"
         type: date
         required: true
+      - name: assessment_image
+        label: "위험성평가표 이미지 (스캔/사진 첨부)"
+        type: image
       - name: body
-        label: "위험성평가 내용"
+        label: "추가 설명 및 위험요인 텍스트 (선택)"
         type: rich-text
