@@ -3,12 +3,31 @@ media:
   output: /assets/images
 
 content:
+  - name: companies
+    label: "1. 협력업체 관리 (업체 등록)"
+    type: collection
+    path: _companies
+    filename: "{fields.name}.md"
+    view:
+      fields: [ name, work_type, manager ]
+    fields:
+      - name: name
+        label: "업체명 (예 - (주)한국건설)"
+        type: string
+        required: true
+      - name: work_type
+        label: "주력 공종"
+        type: string
+      - name: manager
+        label: "현장 담당자 및 연락처"
+        type: string
+
   - name: posts
-    label: "업체별 위험성평가"
+    label: "2. 업체별 위험성평가"
     type: collection
     path: _posts
     view:
-      fields: [ company, title, work_type, date ]
+      fields: [ company, title, date ]
     fields:
       - name: layout
         label: "레이아웃"
@@ -16,15 +35,19 @@ content:
         default: post
         hidden: true
       - name: company
-        label: "업체명 (왼쪽 메뉴 분류용 - 예: (주)한국건설)"
-        type: string
+        label: "업체 선택"
+        type: reference
+        options:
+          collection: companies
+          value: name
+          label: name
         required: true
       - name: title
         label: "작업명 / 평가 제목"
         type: string
         required: true
       - name: work_type
-        label: "공종 (예 - 철골공사, 전기공사)"
+        label: "세부 공종"
         type: string
         required: true
       - name: date
