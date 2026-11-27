@@ -10,9 +10,10 @@
     .header-box { background: #f1f5f9; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #1e3a8a; }
     h1 { margin: 0 0 8px 0; font-size: 1.4rem; }
     .meta { font-size: 0.9rem; color: #475569; }
-    .img-box { margin: 20px 0; text-align: center; }
-    .img-box img, .content img { max-width: 100%; height: auto; border: 1px solid #cbd5e1; border-radius: 8px; }
-    .img-guide { font-size: 0.8rem; color: #64748b; margin-top: 6px; }
+    .img-list { margin: 20px 0; }
+    .img-item { margin-bottom: 16px; text-align: center; }
+    .img-item img, .content img { max-width: 100%; height: auto; border: 1px solid #cbd5e1; border-radius: 8px; display: block; margin: 0 auto; }
+    .img-guide { font-size: 0.8rem; color: #64748b; text-align: center; margin-bottom: 12px; }
     table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95rem; }
     th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; }
     th { background: #e2e8f0; }
@@ -22,15 +23,19 @@
   <a href="{{ '/' | relative_url }}" class="back-btn">← 전체 업체 목록으로</a>
   <div class="header-box">
     <h1>{{ page.title }}</h1>
-    <div class="meta">공종: {{ page.work_type }} | 작성일: {{ page.date | date: "%Y-%m-%d" }}</div>
+    <div class="meta">업체: {{ page.company }} | 공종: {{ page.work_type }} | 작성일: {{ page.date | date: "%Y-%m-%d" }}</div>
   </div>
 
-  {% if page.assessment_image %}
-  <div class="img-box">
-    <a href="{{ page.assessment_image | relative_url }}" target="_blank">
-      <img src="{{ page.assessment_image | relative_url }}" alt="{{ page.title }} 위험성평가표">
-    </a>
-    <div class="img-guide">* 이미지를 터치하면 원본 크기로 크게 볼 수 있습니다.</div>
+  {% if page.assessment_images %}
+  <div class="img-guide">* 이미지를 터치하면 원본 크기로 크게 볼 수 있습니다. (총 {{ page.assessment_images.size }}장)</div>
+  <div class="img-list">
+    {% for img in page.assessment_images %}
+    <div class="img-item">
+      <a href="{{ img | relative_url }}" target="_blank">
+        <img src="{{ img | relative_url }}" alt="{{ page.title }} 위험성평가표 {{ forloop.index }}">
+      </a>
+    </div>
+    {% endfor %}
   </div>
   {% endif %}
 
