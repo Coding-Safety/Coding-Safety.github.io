@@ -7,6 +7,7 @@ content:
     label: "1. 협력업체 관리 (업체 등록)"
     type: collection
     path: _companies
+    format: yaml-frontmatter
     filename: "{fields.name}.md"
     view:
       fields: [ name, work_type, manager ]
