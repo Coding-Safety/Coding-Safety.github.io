@@ -10,13 +10,13 @@ layout: none
   <style>
     * { box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; margin: 0; background: #f8f9fa; color: #212529; }
-    header { background: #1e3a8a; color: white; padding: 18px 24px; }
+    header { background: #1e3a8a; color: white; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     header h1 { margin: 0 0 4px 0; font-size: 1.35rem; }
     header p { margin: 0; font-size: 0.88rem; opacity: 0.9; }
+    .admin-btn { background: rgba(255, 255, 255, 0.16); color: white; border: 1px solid rgba(255, 255, 255, 0.45); padding: 8px 14px; border-radius: 7px; text-decoration: none; font-size: 0.88rem; font-weight: bold; white-space: nowrap; }
+    .admin-btn:hover { background: rgba(255, 255, 255, 0.28); }
 
     .layout { display: flex; max-width: 1080px; margin: 20px auto; padding: 0 16px; gap: 20px; align-items: flex-start; }
-
-    /* 왼쪽 업체별 메뉴 사이드바 */
     .sidebar { width: 240px; flex-shrink: 0; background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; }
     .sidebar-title { font-size: 0.9rem; font-weight: bold; color: #475569; margin: 0 0 10px 6px; }
     .menu-btn { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left; background: none; border: none; padding: 10px 12px; border-radius: 7px; font-size: 0.95rem; color: #334155; cursor: pointer; margin-bottom: 4px; }
@@ -25,7 +25,6 @@ layout: none
     .badge { font-size: 0.78rem; background: #e2e8f0; color: #334155; padding: 2px 7px; border-radius: 12px; }
     .menu-btn.active .badge { background: rgba(255,255,255,0.25); color: white; }
 
-    /* 오른쪽 메인 목록 영역 */
     .main { flex: 1; min-width: 0; }
     .search-box { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 14px; background: white; }
     .card { display: block; background: white; padding: 16px; border-radius: 8px; margin-bottom: 12px; text-decoration: none; color: inherit; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
@@ -42,8 +41,11 @@ layout: none
 </head>
 <body>
   <header>
-    <h1>현장 업체별 위험성평가</h1>
-    <p>왼쪽 메뉴에서 업체를 선택하거나 검색하여 위험성평가표를 확인하세요.</p>
+    <div>
+      <h1>현장 업체별 위험성평가</h1>
+      <p>왼쪽 메뉴에서 업체를 선택하거나 검색하여 위험성평가표를 확인하세요.</p>
+    </div>
+    <a href="/admin.html" class="admin-btn">관리자 페이지</a>
   </header>
 
   {% assign all_companies = site.companies | map: "name" %}
@@ -83,14 +85,12 @@ layout: none
 
   <script>
     let selectedCompany = 'ALL';
-
     function selectCompany(company, btn) {
       selectedCompany = company;
       document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       filterCards();
     }
-
     function filterCards() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       document.querySelectorAll('.card').forEach(card => {
