@@ -34,7 +34,6 @@ layout: none
     .card-title { font-weight: bold; font-size: 1.08rem; color: #0f172a; margin-bottom: 6px; }
     .card-meta { font-size: 0.85rem; color: #64748b; }
 
-    /* 모바일 화면 대응 */
     @media (max-width: 768px) {
       .layout { flex-direction: column; }
       .sidebar { width: 100%; }
@@ -47,7 +46,9 @@ layout: none
     <p>왼쪽 메뉴에서 업체를 선택하거나 검색하여 위험성평가표를 확인하세요.</p>
   </header>
 
-  {% assign companies = site.posts | map: "company" | compact | uniq | sort %}
+  {% assign all_companies = site.companies | map: "name" %}
+  {% assign post_companies = site.posts | map: "company" %}
+  {% assign companies = all_companies | concat: post_companies | compact | uniq | sort %}
 
   <div class="layout">
     <aside class="sidebar">
