@@ -1,0 +1,32 @@
+media:
+  input: assets/images
+  output: /assets/images
+
+content:
+  - name: posts
+    label: 업체별 위험성평가
+    type: collection
+    path: _posts
+    view:
+      fields: [ title, work_type, date ]
+    fields:
+      - name: layout
+        label: 레이아웃 (수정불필요)
+        type: string
+        default: post
+        hidden: true
+      - name: title
+        label: 업체명 및 작업명
+        type: string
+        required: true
+      - name: work_type
+        label: 공종 (예: 철골공사, 전기공사)
+        type: string
+        required: true
+      - name: date
+        label: 등록일
+        type: date
+        required: true
+      - name: body
+        label: 위험성평가 내용 (표/텍스트/사진)
+        type: rich-text
